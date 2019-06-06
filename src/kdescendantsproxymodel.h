@@ -168,6 +168,12 @@ public:
     QModelIndex parent(const QModelIndex &) const override;
     int columnCount(const QModelIndex &index = QModelIndex()) const override;
 
+    bool isSourceIndexExpanded(const QModelIndex &sourceIndex) const;
+    Q_INVOKABLE void expandChild(int row);
+    Q_INVOKABLE void collapseChild(int row);
+    Q_INVOKABLE bool isRowExpanded(int row) const; //TODO: extra role
+    
+
     Qt::DropActions supportedDropActions() const override;
 
     /**
@@ -175,7 +181,6 @@ public:
     */
     virtual QModelIndexList match(const QModelIndex &start, int role, const QVariant &value,
                                   int hits = 1, Qt::MatchFlags flags = Qt::MatchFlags(Qt::MatchStartsWith | Qt::MatchWrap)) const override;
-
 private:
     Q_DECLARE_PRIVATE(KDescendantsProxyModel)
     //@cond PRIVATE
