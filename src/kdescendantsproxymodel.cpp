@@ -262,14 +262,41 @@ void KDescendantsProxyModel::collapseChild(int row)
 
     d_ptr->m_expandedSourceIndexes.remove(QPersistentModelIndex(sourceIndex));
 
+    {
+        Mapping::right_iterator it = d_ptr->m_mapping.rightLowerBound(rowStart);
+        const Mapping::right_iterator endIt = d_ptr->m_mapping.rightUpperBound(rowEnd);
+
+        if (endIt != d_ptr->m_mapping.rightEnd())
+            while (it != endIt) {
+                it = d_ptr->m_mapping.eraseRight(it);
+            }
+        else
+            while (it != d_ptr->m_mapping.rightUpperBound(rowEnd)) {
+                it = d_ptr->m_mapping.eraseRight(it);
+            }
+    }
+
     d_ptr->m_removePair = qMakePair(rowStart, rowEnd);
+    
     beginRemoveRows(QModelIndex(), rowStart, rowEnd);
+    d_ptr->synchronousMappingRefresh();
     endRemoveRows();
 }
 
 bool KDescendantsProxyModel::isRowExpanded(int row) const
 {
     return isSourceIndexExpanded(mapToSource(index(row, 0)));
+}
+
+int KDescendantsProxyModel::rowIndent(int row) const
+{
+    int level = 0;
+    QModelIndex sourceIndex = mapToSource(index(row, 0));
+    while (sourceIndex.isValid()) {
+        ++level;
+        sourceIndex = sourceIndex.parent();
+    }
+    return level;
 }
 
 bool KDescendantsProxyModel::isSourceIndexExpanded(const QModelIndex &sourceIndex) const

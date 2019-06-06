@@ -172,6 +172,7 @@ public:
     Q_INVOKABLE void expandChild(int row);
     Q_INVOKABLE void collapseChild(int row);
     Q_INVOKABLE bool isRowExpanded(int row) const; //TODO: extra role
+    Q_INVOKABLE int rowIndent(int row) const; //TODO: extra role
     
 
     Qt::DropActions supportedDropActions() const override;
