@@ -23,7 +23,9 @@
 #include <QTest>
 #include <QSignalSpy>
 
-class tst_KDescendantProxyModel : public QObject
+#include "TestSuite.h"
+
+class tst_KDescendantProxyModel : public TestSuite
 {
     Q_OBJECT
     QAbstractItemModel *createTree(const QString &prefix)
@@ -215,7 +217,7 @@ void tst_KDescendantProxyModel::testRemoveSeparator()
 
 }
 
-QTEST_MAIN(tst_KDescendantProxyModel)
+static tst_KDescendantProxyModel TEST_DescendantProxyModel;
 
 #include "kdescendantsproxymodeltest.moc"
 

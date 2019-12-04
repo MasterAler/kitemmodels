@@ -18,6 +18,8 @@
     02110-1301, USA.
 */
 
+#include "TestSuite.h"
+
 #include <QSignalSpy>
 #include <QTest>
 #include <QDebug>
@@ -31,7 +33,7 @@ using namespace TestModelHelpers;
 
 Q_DECLARE_METATYPE(QModelIndex)
 
-class tst_KRearrangeColumnsProxyModel : public QObject
+class tst_KRearrangeColumnsProxyModel : public TestSuite
 {
     Q_OBJECT
 
@@ -257,6 +259,6 @@ private:
     QStandardItemModel mod;
 };
 
-QTEST_MAIN(tst_KRearrangeColumnsProxyModel)
+static tst_KRearrangeColumnsProxyModel TEST_KRearrangeColumnsProxyMode;
 
 #include "krearrangecolumnsproxymodeltest.moc"

@@ -32,12 +32,14 @@
 #include "test_model_helpers.h"
 using namespace TestModelHelpers;
 
-class KSelectionProxyModelTest : public QObject
+#include "TestSuite.h"
+
+class KSelectionProxyModelTest : public TestSuite
 {
   Q_OBJECT
 public:
   KSelectionProxyModelTest(QObject* parent = nullptr)
-    : QObject(parent),
+    : TestSuite(parent),
       days({
           QStringLiteral("Monday"),
           QStringLiteral("Tuesday"),
@@ -936,6 +938,6 @@ void KSelectionProxyModelTest::selectionMapping()
     QCOMPARE(proxy.mapSelectionToSource(proxySel), sourceSel);
 }
 
-QTEST_MAIN(KSelectionProxyModelTest)
+static KSelectionProxyModelTest TEST_KSelectionProxyModelTest;
 
 #include "kselectionproxymodeltest.moc"

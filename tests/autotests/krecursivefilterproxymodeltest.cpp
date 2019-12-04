@@ -20,6 +20,7 @@
 
 
 #include <QTest>
+#include "TestSuite.h"
 
 #include <krecursivefilterproxymodel.h>
 #include <QStandardItemModel>
@@ -169,7 +170,7 @@ static void fillModel(QStandardItemModel &model, const QString &str)
     }
 }
 
-class KRecursiveFilterProxyModelTest : public QObject
+class KRecursiveFilterProxyModelTest : public TestSuite
 {
     Q_OBJECT
 private:
@@ -627,6 +628,6 @@ private:
     }
 };
 
-QTEST_MAIN(KRecursiveFilterProxyModelTest)
+static KRecursiveFilterProxyModelTest TEST_KRecursiveFilterProxyModelTest;
 
 #include "krecursivefilterproxymodeltest.moc"

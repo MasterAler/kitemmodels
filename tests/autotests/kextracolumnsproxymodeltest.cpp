@@ -33,7 +33,9 @@ using namespace TestModelHelpers;
 
 Q_DECLARE_METATYPE(QModelIndex)
 
-class tst_KExtraColumnsProxyModel : public QObject
+#include "TestSuite.h"
+
+class tst_KExtraColumnsProxyModel : public TestSuite
 {
     Q_OBJECT
 
@@ -434,6 +436,6 @@ private:
     QStandardItemModel mod;
 };
 
-QTEST_MAIN(tst_KExtraColumnsProxyModel)
+static tst_KExtraColumnsProxyModel TEST_KExtraColumnsProxyModel;
 
 #include "kextracolumnsproxymodeltest.moc"

@@ -11,7 +11,9 @@ using namespace TestModelHelpers;
 
 Q_DECLARE_METATYPE(QModelIndex)
 
-class tst_KConcatenateRowsProxyModel : public QObject
+#include "TestSuite.h"
+
+class tst_KConcatenateRowsProxyModel : public TestSuite
 {
     Q_OBJECT
 
@@ -420,6 +422,6 @@ private:
     QStandardItemModel mod2;
 };
 
-QTEST_MAIN(tst_KConcatenateRowsProxyModel)
+static tst_KConcatenateRowsProxyModel TEST_KConcatenateRowsProxyModel;
 
 #include "kconcatenaterowsproxymodeltest.moc"
