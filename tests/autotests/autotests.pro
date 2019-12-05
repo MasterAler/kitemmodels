@@ -20,7 +20,7 @@ SOURCES +=  \
 HEADERS += \
     TestSuite.h \
     klinkitemselectionmodeltest.h \
-#    test_model_helpers.h
+    test_model_helpers.h
 
 include(../proxymodeltestsuite.pri)
 
