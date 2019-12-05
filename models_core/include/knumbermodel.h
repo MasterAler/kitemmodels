@@ -110,7 +110,7 @@ Q_SIGNALS:
     void formattingOptionsChanged();
 
 private:
-    QScopedPointer<KNumberModelPrivate> d;
+    const QScopedPointer<KNumberModelPrivate> d;
 };
 
 #endif

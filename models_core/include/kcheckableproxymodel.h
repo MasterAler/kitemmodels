@@ -86,9 +86,7 @@ protected:
 
 private:
     Q_DECLARE_PRIVATE(KCheckableProxyModel)
-    KCheckableProxyModelPrivate *const d_ptr;
-
-    Q_PRIVATE_SLOT(d_func(), void selectionChanged(const QItemSelection &, const QItemSelection &))
+    const QScopedPointer<KCheckableProxyModelPrivate> d_ptr;
 };
 
 #endif

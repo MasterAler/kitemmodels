@@ -39,7 +39,7 @@ private Q_SLOTS:
 
     void shouldAggregateTwoModelsCorrectly()
     {
-        // Given a combining proxy
+//        // Given a combining proxy
         KConcatenateRowsProxyModel pm;
 
         // When adding two source models
@@ -94,7 +94,7 @@ private Q_SLOTS:
 
     void shouldAggregateTwoEmptyModelsWhichThenGetFilled()
     {
-        // Given a combining proxy
+//        // Given a combining proxy
         KConcatenateRowsProxyModel pm;
 
         // When adding two empty models
@@ -173,7 +173,7 @@ private Q_SLOTS:
 
     void shouldHandleRowInsertionAndRemoval()
     {
-        // Given two models combined
+//        // Given two models combined
         KConcatenateRowsProxyModel pm;
         pm.addSourceModel(&mod);
         pm.addSourceModel(&mod2);
@@ -229,7 +229,7 @@ private Q_SLOTS:
 
     void shouldAggregateAnotherModelThenRemoveModels()
     {
-        // Given two models combined, and a third model
+//        // Given two models combined, and a third model
         KConcatenateRowsProxyModel pm;
         pm.addSourceModel(&mod);
         pm.addSourceModel(&mod2);
@@ -297,7 +297,7 @@ private Q_SLOTS:
 
     void shouldHandleColumnInsertionAndRemoval()
     {
-        // Given two models combined
+//        // Given two models combined
         KConcatenateRowsProxyModel pm;
         pm.addSourceModel(&mod);
         pm.addSourceModel(&mod2);
@@ -319,7 +319,7 @@ private Q_SLOTS:
 
     void shouldPropagateLayoutChanged()
     {
-        // Given two source models, the second one being a QSFPM
+//        // Given two source models, the second one being a QSFPM
         KConcatenateRowsProxyModel pm;
         pm.addSourceModel(&mod);
 
