@@ -3,6 +3,8 @@ QT       -= gui
 TARGET = kitemmodels
 TEMPLATE = lib
 
+CONFIG(debug, debug|release):TARGET = $$join(TARGET,,,d)
+
 DEFINES += KITEMMODELS_LIBRARY
 
 SOURCES += \
@@ -16,11 +18,7 @@ SOURCES += \
         src/knumbermodel.cpp \
         src/krearrangecolumnsproxymodel.cpp \
         src/krecursivefilterproxymodel.cpp \
-        src/kselectionproxymodel.cpp \
-        src/kdescendantsproxymodel_p.cpp \
-        src/kconcatenaterowsproxymodel_p.cpp \
-        src/krecursivefilterproxymodel_p.cpp \
-        src/kselectionproxymodel_p.cpp
+        src/kselectionproxymodel.cpp
 
 HEADERS += \
         include/kitemmodels_debug.h \
@@ -37,11 +35,7 @@ HEADERS += \
         include/krearrangecolumnsproxymodel.h \
         include/krecursivefilterproxymodel.h \
         include/kselectionproxymodel.h \
-        include/kvoidpointerfactory_p.h \
-        include/kdescendantsproxymodel_p.h \
-        include/kconcatenaterowsproxymodel_p.h \
-        include/krecursivefilterproxymodel_p.h \
-        include/kselectionproxymodel_p.h
+        include/kvoidpointerfactory_p.h
 
 INCLUDEPATH *= $$PWD/include
 DESTDIR = $$PWD/../bin

@@ -82,7 +82,7 @@ public:
      * The ownership of @p sourceModel is not affected by this.
      * The same source model cannot be added more than once.
      */
-    Q_SCRIPTABLE void addSourceModel(QAbstractItemModel* sourceModel);
+    Q_SCRIPTABLE void addSourceModel(QAbstractItemModel *sourceModel);
 
     /**
      * Removes the source model @p sourceModel.
@@ -145,8 +145,23 @@ public:
     QHash<int, QByteArray> roleNames() const override;
 
 private:
-    Q_DECLARE_PRIVATE(KConcatenateRowsProxyModel)
-    const QScopedPointer<KConcatenateRowsProxyModelPrivate> d_ptr;
+    Q_PRIVATE_SLOT(d, void slotRowsAboutToBeInserted(const QModelIndex &, int start, int end))
+    Q_PRIVATE_SLOT(d, void slotRowsInserted(const QModelIndex &, int start, int end))
+    Q_PRIVATE_SLOT(d, void slotRowsAboutToBeRemoved(const QModelIndex &, int start, int end))
+    Q_PRIVATE_SLOT(d, void slotRowsRemoved(const QModelIndex &, int start, int end))
+    Q_PRIVATE_SLOT(d, void slotColumnsAboutToBeInserted(const QModelIndex &parent, int start, int end))
+    Q_PRIVATE_SLOT(d, void slotColumnsInserted(const QModelIndex &parent, int, int))
+    Q_PRIVATE_SLOT(d, void slotColumnsAboutToBeRemoved(const QModelIndex &parent, int start, int end))
+    Q_PRIVATE_SLOT(d, void slotColumnsRemoved(const QModelIndex &parent, int, int))
+    Q_PRIVATE_SLOT(d, void slotDataChanged(const QModelIndex &from, const QModelIndex &to, const QVector<int> &roles))
+    Q_PRIVATE_SLOT(d, void slotSourceLayoutAboutToBeChanged(QList<QPersistentModelIndex>, QAbstractItemModel::LayoutChangeHint))
+    Q_PRIVATE_SLOT(d, void slotSourceLayoutChanged(const QList<QPersistentModelIndex> &, QAbstractItemModel::LayoutChangeHint))
+    Q_PRIVATE_SLOT(d, void slotModelAboutToBeReset())
+    Q_PRIVATE_SLOT(d, void slotModelReset())
+
+private:
+    friend class KConcatenateRowsProxyModelPrivate;
+    const QScopedPointer<KConcatenateRowsProxyModelPrivate> d;
 };
 
-#endif // KCONCATENATEROWSPROXYMODEL_H
+#endif

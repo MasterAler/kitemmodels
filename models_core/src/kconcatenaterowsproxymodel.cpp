@@ -19,20 +19,52 @@
 */
 
 #include "kconcatenaterowsproxymodel.h"
-#include "kconcatenaterowsproxymodel_p.h"
 
+class KConcatenateRowsProxyModelPrivate
+{
+public:
+    KConcatenateRowsProxyModelPrivate(KConcatenateRowsProxyModel* model)
+        : q(model)
+    {}
+
+    int computeRowsPrior(const QAbstractItemModel *sourceModel) const;
+    QAbstractItemModel *sourceModelForRow(int row, int *sourceRow) const;
+
+    void slotRowsAboutToBeInserted(const QModelIndex &, int start, int end);
+    void slotRowsInserted(const QModelIndex &, int start, int end);
+    void slotRowsAboutToBeRemoved(const QModelIndex &, int start, int end);
+    void slotRowsRemoved(const QModelIndex &, int start, int end);
+    void slotColumnsAboutToBeInserted(const QModelIndex &parent, int start, int end);
+    void slotColumnsInserted(const QModelIndex &parent, int, int);
+    void slotColumnsAboutToBeRemoved(const QModelIndex &parent, int start, int end);
+    void slotColumnsRemoved(const QModelIndex &parent, int, int);
+    void slotDataChanged(const QModelIndex &from, const QModelIndex &to, const QVector<int> &roles);
+    void slotSourceLayoutAboutToBeChanged(const QList<QPersistentModelIndex> &sourceParents, QAbstractItemModel::LayoutChangeHint hint);
+    void slotSourceLayoutChanged(const QList<QPersistentModelIndex> &sourceParents, QAbstractItemModel::LayoutChangeHint hint);
+    void slotModelAboutToBeReset();
+    void slotModelReset();
+
+    KConcatenateRowsProxyModel *q;
+    QList<QAbstractItemModel *> m_models;
+    int m_rowCount = 0; // have to maintain it here since we can't compute during model destruction
+
+    // for layoutAboutToBeChanged/layoutChanged
+    QVector<QPersistentModelIndex> layoutChangePersistentIndexes;
+    QModelIndexList proxyIndexes;
+};
 
 KConcatenateRowsProxyModel::KConcatenateRowsProxyModel(QObject *parent)
     : QAbstractItemModel(parent),
-      d_ptr(new KConcatenateRowsProxyModelPrivate(this))
-{ }
+      d(new KConcatenateRowsProxyModelPrivate(this))
+{
+}
 
 KConcatenateRowsProxyModel::~KConcatenateRowsProxyModel()
-{ }
+{
+}
 
 QModelIndex KConcatenateRowsProxyModel::mapFromSource(const QModelIndex &sourceIndex) const
 {
-    Q_D(const KConcatenateRowsProxyModel);
     const QAbstractItemModel *sourceModel = sourceIndex.model();
     if (!sourceModel) {
         return {};
@@ -43,7 +75,6 @@ QModelIndex KConcatenateRowsProxyModel::mapFromSource(const QModelIndex &sourceI
 
 QModelIndex KConcatenateRowsProxyModel::mapToSource(const QModelIndex &proxyIndex) const
 {
-    Q_D(const KConcatenateRowsProxyModel);
     if (!proxyIndex.isValid()) {
         return QModelIndex();
     }
@@ -92,7 +123,6 @@ Qt::ItemFlags KConcatenateRowsProxyModel::flags(const QModelIndex &index) const
 
 QVariant KConcatenateRowsProxyModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    Q_D(const KConcatenateRowsProxyModel);
     if (d->m_models.isEmpty()) {
         return QVariant();
     }
@@ -110,7 +140,6 @@ QVariant KConcatenateRowsProxyModel::headerData(int section, Qt::Orientation ori
 
 int KConcatenateRowsProxyModel::columnCount(const QModelIndex &parent) const
 {
-    Q_D(const KConcatenateRowsProxyModel);
     if (d->m_models.isEmpty()) {
         return 0;
     }
@@ -122,7 +151,6 @@ int KConcatenateRowsProxyModel::columnCount(const QModelIndex &parent) const
 
 QHash<int, QByteArray> KConcatenateRowsProxyModel::roleNames() const
 {
-    Q_D(const KConcatenateRowsProxyModel);
     if (d->m_models.isEmpty()) {
         return {};
     }
@@ -138,8 +166,6 @@ QModelIndex KConcatenateRowsProxyModel::index(int row, int column, const QModelI
         return {};
     }
     int sourceRow;
-
-    Q_D(const KConcatenateRowsProxyModel);
     QAbstractItemModel *sourceModel = d->sourceModelForRow(row, &sourceRow);
     if (!sourceModel) {
         return QModelIndex();
@@ -158,39 +184,35 @@ int KConcatenateRowsProxyModel::rowCount(const QModelIndex &parent) const
         return 0;    // flat model
     }
 
-    Q_D(const KConcatenateRowsProxyModel);
     return d->m_rowCount;
 }
 
-void KConcatenateRowsProxyModel::addSourceModel(QAbstractItemModel* sourceModel)
+void KConcatenateRowsProxyModel::addSourceModel(QAbstractItemModel *sourceModel)
 {
-    Q_D(KConcatenateRowsProxyModel);
     Q_ASSERT(sourceModel);
     Q_ASSERT(!d->m_models.contains(sourceModel));
+    connect(sourceModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), this, SLOT(slotDataChanged(QModelIndex,QModelIndex,QVector<int>)));
+    connect(sourceModel, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(slotRowsInserted(QModelIndex,int,int)));
+    connect(sourceModel, SIGNAL(rowsRemoved(QModelIndex,int,int)), this, SLOT(slotRowsRemoved(QModelIndex,int,int)));
+    connect(sourceModel, SIGNAL(rowsAboutToBeInserted(QModelIndex,int,int)), this, SLOT(slotRowsAboutToBeInserted(QModelIndex,int,int)));
+    connect(sourceModel, SIGNAL(rowsAboutToBeRemoved(QModelIndex,int,int)), this, SLOT(slotRowsAboutToBeRemoved(QModelIndex,int,int)));
 
-    connect(sourceModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), d, SLOT(slotDataChanged(QModelIndex,QModelIndex,QVector<int>)));
-    connect(sourceModel, SIGNAL(rowsInserted(QModelIndex,int,int)), d, SLOT(slotRowsInserted(QModelIndex,int,int)));
-    connect(sourceModel, SIGNAL(rowsRemoved(QModelIndex,int,int)), d, SLOT(slotRowsRemoved(QModelIndex,int,int)));
-    connect(sourceModel, SIGNAL(rowsAboutToBeInserted(QModelIndex,int,int)), d, SLOT(slotRowsAboutToBeInserted(QModelIndex,int,int)));
-    connect(sourceModel, SIGNAL(rowsAboutToBeRemoved(QModelIndex,int,int)), d, SLOT(slotRowsAboutToBeRemoved(QModelIndex,int,int)));
-
-    connect(sourceModel, SIGNAL(columnsInserted(QModelIndex,int,int)), d, SLOT(slotColumnsInserted(QModelIndex,int,int)));
-    connect(sourceModel, SIGNAL(columnsRemoved(QModelIndex,int,int)), d, SLOT(slotColumnsRemoved(QModelIndex,int,int)));
-    connect(sourceModel, SIGNAL(columnsAboutToBeInserted(QModelIndex,int,int)), d, SLOT(slotColumnsAboutToBeInserted(QModelIndex,int,int)));
-    connect(sourceModel, SIGNAL(columnsAboutToBeRemoved(QModelIndex,int,int)), d, SLOT(slotColumnsAboutToBeRemoved(QModelIndex,int,int)));
+    connect(sourceModel, SIGNAL(columnsInserted(QModelIndex,int,int)), this, SLOT(slotColumnsInserted(QModelIndex,int,int)));
+    connect(sourceModel, SIGNAL(columnsRemoved(QModelIndex,int,int)), this, SLOT(slotColumnsRemoved(QModelIndex,int,int)));
+    connect(sourceModel, SIGNAL(columnsAboutToBeInserted(QModelIndex,int,int)), this, SLOT(slotColumnsAboutToBeInserted(QModelIndex,int,int)));
+    connect(sourceModel, SIGNAL(columnsAboutToBeRemoved(QModelIndex,int,int)), this, SLOT(slotColumnsAboutToBeRemoved(QModelIndex,int,int)));
 
     connect(sourceModel, SIGNAL(layoutAboutToBeChanged(QList<QPersistentModelIndex>,QAbstractItemModel::LayoutChangeHint)),
-            d, SLOT(slotSourceLayoutAboutToBeChanged(QList<QPersistentModelIndex>,QAbstractItemModel::LayoutChangeHint)));
+            this, SLOT(slotSourceLayoutAboutToBeChanged(QList<QPersistentModelIndex>,QAbstractItemModel::LayoutChangeHint)));
     connect(sourceModel, SIGNAL(layoutChanged(QList<QPersistentModelIndex>,QAbstractItemModel::LayoutChangeHint)),
-            d, SLOT(slotSourceLayoutChanged(QList<QPersistentModelIndex>,QAbstractItemModel::LayoutChangeHint)));
-    connect(sourceModel, SIGNAL(modelAboutToBeReset()), d, SLOT(slotModelAboutToBeReset()));
-    connect(sourceModel, SIGNAL(modelReset()), d, SLOT(slotModelReset()));
+            this, SLOT(slotSourceLayoutChanged(QList<QPersistentModelIndex>,QAbstractItemModel::LayoutChangeHint)));
+    connect(sourceModel, SIGNAL(modelAboutToBeReset()), this, SLOT(slotModelAboutToBeReset()));
+    connect(sourceModel, SIGNAL(modelReset()), this, SLOT(slotModelReset()));
 
     const int newRows = sourceModel->rowCount();
     if (newRows > 0) {
         beginInsertRows(QModelIndex(), d->m_rowCount, d->m_rowCount + newRows - 1);
     }
-
     d->m_rowCount += newRows;
     d->m_models.append(sourceModel);
     if (newRows > 0) {
@@ -200,13 +222,13 @@ void KConcatenateRowsProxyModel::addSourceModel(QAbstractItemModel* sourceModel)
 
 QList<QAbstractItemModel*> KConcatenateRowsProxyModel::sources() const
 {
-    Q_D(const KConcatenateRowsProxyModel);
     return d->m_models;
 }
 
+
+
 void KConcatenateRowsProxyModel::removeSourceModel(QAbstractItemModel *sourceModel)
 {
-    Q_D(KConcatenateRowsProxyModel);
     Q_ASSERT(d->m_models.contains(sourceModel));
     disconnect(sourceModel, nullptr, this, nullptr);
 
@@ -222,3 +244,194 @@ void KConcatenateRowsProxyModel::removeSourceModel(QAbstractItemModel *sourceMod
         endRemoveRows();
     }
 }
+
+void KConcatenateRowsProxyModelPrivate::slotRowsAboutToBeInserted(const QModelIndex &, int start, int end)
+{
+    const QAbstractItemModel *model = qobject_cast<QAbstractItemModel *>(q->sender());
+    const int rowsPrior = computeRowsPrior(model);
+    q->beginInsertRows(QModelIndex(), rowsPrior + start, rowsPrior + end);
+}
+
+void KConcatenateRowsProxyModelPrivate::slotRowsInserted(const QModelIndex &, int start, int end)
+{
+    m_rowCount += end - start + 1;
+    q->endInsertRows();
+}
+
+void KConcatenateRowsProxyModelPrivate::slotRowsAboutToBeRemoved(const QModelIndex &, int start, int end)
+{
+    const QAbstractItemModel *model = qobject_cast<QAbstractItemModel *>(q->sender());
+    const int rowsPrior = computeRowsPrior(model);
+    q->beginRemoveRows(QModelIndex(), rowsPrior + start, rowsPrior + end);
+}
+
+void KConcatenateRowsProxyModelPrivate::slotRowsRemoved(const QModelIndex &, int start, int end)
+{
+    m_rowCount -= end - start + 1;
+    q->endRemoveRows();
+}
+
+void KConcatenateRowsProxyModelPrivate::slotColumnsAboutToBeInserted(const QModelIndex &parent, int start, int end)
+{
+    if (parent.isValid()) { // we are flat
+        return;
+    }
+    const QAbstractItemModel *model = qobject_cast<QAbstractItemModel *>(q->sender());
+    if (m_models.at(0) == model) {
+        q->beginInsertColumns(QModelIndex(), start, end);
+    }
+}
+
+void KConcatenateRowsProxyModelPrivate::slotColumnsInserted(const QModelIndex &parent, int, int)
+{
+    if (parent.isValid()) { // we are flat
+        return;
+    }
+    const QAbstractItemModel *model = qobject_cast<QAbstractItemModel *>(q->sender());
+    if (m_models.at(0) == model) {
+        q->endInsertColumns();
+    }
+}
+
+void KConcatenateRowsProxyModelPrivate::slotColumnsAboutToBeRemoved(const QModelIndex &parent, int start, int end)
+{
+    if (parent.isValid()) { // we are flat
+        return;
+    }
+    const QAbstractItemModel *model = qobject_cast<QAbstractItemModel *>(q->sender());
+    if (m_models.at(0) == model) {
+        q->beginRemoveColumns(QModelIndex(), start, end);
+    }
+}
+
+void KConcatenateRowsProxyModelPrivate::slotColumnsRemoved(const QModelIndex &parent, int, int)
+{
+    if (parent.isValid()) { // we are flat
+        return;
+    }
+    const QAbstractItemModel *model = qobject_cast<QAbstractItemModel *>(q->sender());
+    if (m_models.at(0) == model) {
+        q->endRemoveColumns();
+    }
+}
+
+void KConcatenateRowsProxyModelPrivate::slotDataChanged(const QModelIndex &from, const QModelIndex &to, const QVector<int> &roles)
+{
+    if (!from.isValid()) { // QSFPM bug, it emits dataChanged(invalid, invalid) if a cell in a hidden column changes
+        return;
+    }
+    const QModelIndex myFrom = q->mapFromSource(from);
+    const QModelIndex myTo = q->mapFromSource(to);
+    emit q->dataChanged(myFrom, myTo, roles);
+}
+
+void KConcatenateRowsProxyModelPrivate::slotSourceLayoutAboutToBeChanged(const QList<QPersistentModelIndex> &sourceParents, QAbstractItemModel::LayoutChangeHint hint)
+{
+    QList<QPersistentModelIndex> parents;
+    parents.reserve(sourceParents.size());
+    for (const QPersistentModelIndex &parent : sourceParents) {
+        if (!parent.isValid()) {
+            parents << QPersistentModelIndex();
+            continue;
+        }
+        const QModelIndex mappedParent = q->mapFromSource(parent);
+        Q_ASSERT(mappedParent.isValid());
+        parents << mappedParent;
+    }
+
+    emit q->layoutAboutToBeChanged(parents, hint);
+
+    const QModelIndexList persistentIndexList = q->persistentIndexList();
+    layoutChangePersistentIndexes.reserve(persistentIndexList.size());
+
+    for (const QPersistentModelIndex &proxyPersistentIndex : persistentIndexList) {
+        proxyIndexes << proxyPersistentIndex;
+        Q_ASSERT(proxyPersistentIndex.isValid());
+        const QPersistentModelIndex srcPersistentIndex = q->mapToSource(proxyPersistentIndex);
+        Q_ASSERT(srcPersistentIndex.isValid());
+        layoutChangePersistentIndexes << srcPersistentIndex;
+    }
+}
+
+void KConcatenateRowsProxyModelPrivate::slotSourceLayoutChanged(const QList<QPersistentModelIndex> &sourceParents, QAbstractItemModel::LayoutChangeHint hint)
+{
+    for (int i = 0; i < proxyIndexes.size(); ++i) {
+        const QModelIndex proxyIdx = proxyIndexes.at(i);
+        QModelIndex newProxyIdx = q->mapFromSource(layoutChangePersistentIndexes.at(i));
+        q->changePersistentIndex(proxyIdx, newProxyIdx);
+    }
+
+    layoutChangePersistentIndexes.clear();
+    proxyIndexes.clear();
+
+    QList<QPersistentModelIndex> parents;
+    parents.reserve(sourceParents.size());
+    for (const QPersistentModelIndex &parent : sourceParents) {
+        if (!parent.isValid()) {
+            parents << QPersistentModelIndex();
+            continue;
+        }
+        const QModelIndex mappedParent = q->mapFromSource(parent);
+        Q_ASSERT(mappedParent.isValid());
+        parents << mappedParent;
+    }
+    emit q->layoutChanged(parents, hint);
+}
+
+void KConcatenateRowsProxyModelPrivate::slotModelAboutToBeReset()
+{
+        const QAbstractItemModel *sourceModel = qobject_cast<const QAbstractItemModel *>(q->sender());
+    Q_ASSERT(m_models.contains(const_cast<QAbstractItemModel *>(sourceModel)));
+    const int oldRows = sourceModel->rowCount();
+    if (oldRows > 0) {
+        slotRowsAboutToBeRemoved(QModelIndex(), 0, oldRows - 1);
+        slotRowsRemoved(QModelIndex(), 0, oldRows - 1);
+    }
+    if (m_models.at(0) == sourceModel) {
+        q->beginResetModel();
+    }
+}
+
+void KConcatenateRowsProxyModelPrivate::slotModelReset()
+{
+    const QAbstractItemModel *sourceModel = qobject_cast<const QAbstractItemModel *>(q->sender());
+    Q_ASSERT(m_models.contains(const_cast<QAbstractItemModel *>(sourceModel)));
+    if (m_models.at(0) == sourceModel) {
+        q->endResetModel();
+    }
+    const int newRows = sourceModel->rowCount();
+    if (newRows > 0) {
+        slotRowsAboutToBeInserted(QModelIndex(), 0, newRows - 1);
+        slotRowsInserted(QModelIndex(), 0, newRows - 1);
+    }
+}
+
+int KConcatenateRowsProxyModelPrivate::computeRowsPrior(const QAbstractItemModel *sourceModel) const
+{
+    int rowsPrior = 0;
+    for (const QAbstractItemModel *model : qAsConst(m_models)) {
+        if (model == sourceModel) {
+            break;
+        }
+        rowsPrior += model->rowCount();
+    }
+    return rowsPrior;
+}
+
+QAbstractItemModel *KConcatenateRowsProxyModelPrivate::sourceModelForRow(int row, int *sourceRow) const
+{
+    int rowCount = 0;
+    QAbstractItemModel *selection = nullptr;
+    for (QAbstractItemModel *model : qAsConst(m_models)) {
+        const int subRowCount = model->rowCount();
+        if (rowCount + subRowCount > row) {
+            selection = model;
+            break;
+        }
+        rowCount += subRowCount;
+    }
+    *sourceRow = row - rowCount;
+    return selection;
+}
+
+#include "moc_kconcatenaterowsproxymodel.cpp"

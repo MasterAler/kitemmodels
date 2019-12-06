@@ -173,7 +173,9 @@ KModelIndexProxyMapper::KModelIndexProxyMapper(const QAbstractItemModel *leftMod
 }
 
 KModelIndexProxyMapper::~KModelIndexProxyMapper()
-{ }
+{
+    delete d_ptr;
+}
 
 QModelIndex KModelIndexProxyMapper::mapLeftToRight(const QModelIndex &index) const
 {

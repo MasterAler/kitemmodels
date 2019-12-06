@@ -1,5 +1,5 @@
 QT += core gui widgets qml testlib
-CONFIG += qt warn_on depend_includepath # testcase
+CONFIG += qt warn_on depend_includepath #testcase
 
 TEMPLATE = app
 TARGET = autotests

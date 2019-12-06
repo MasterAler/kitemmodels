@@ -129,7 +129,7 @@ Q_SIGNALS:
 private:
     //@cond PRIVATE
     Q_DECLARE_PRIVATE(KModelIndexProxyMapper)
-    const QScopedPointer<KModelIndexProxyMapperPrivate> d_ptr;
+    KModelIndexProxyMapperPrivate *const d_ptr;
     //@endcond
 };
 

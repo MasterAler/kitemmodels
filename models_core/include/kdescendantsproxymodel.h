@@ -17,8 +17,8 @@
     02110-1301, USA.
 */
 
-#ifndef KDESCENDANTSPROXYMODEL_H
-#define KDESCENDANTSPROXYMODEL_H
+#ifndef KDESCENDANTSPROXYMODEL_P_H
+#define KDESCENDANTSPROXYMODEL_P_H
 
 #include <QAbstractProxyModel>
 
@@ -190,7 +190,22 @@ Q_SIGNALS:
 private:
     Q_DECLARE_PRIVATE(KDescendantsProxyModel)
     //@cond PRIVATE
-    const QScopedPointer<KDescendantsProxyModelPrivate> d_ptr;
+    KDescendantsProxyModelPrivate *d_ptr;
+
+    Q_PRIVATE_SLOT(d_func(), void sourceRowsAboutToBeInserted(const QModelIndex &, int, int))
+    Q_PRIVATE_SLOT(d_func(), void sourceRowsInserted(const QModelIndex &, int, int))
+    Q_PRIVATE_SLOT(d_func(), void sourceRowsAboutToBeRemoved(const QModelIndex &, int, int))
+    Q_PRIVATE_SLOT(d_func(), void sourceRowsRemoved(const QModelIndex &, int, int))
+    Q_PRIVATE_SLOT(d_func(), void sourceRowsAboutToBeMoved(const QModelIndex &, int, int, const QModelIndex &, int))
+    Q_PRIVATE_SLOT(d_func(), void sourceRowsMoved(const QModelIndex &, int, int, const QModelIndex &, int))
+    Q_PRIVATE_SLOT(d_func(), void sourceModelAboutToBeReset())
+    Q_PRIVATE_SLOT(d_func(), void sourceModelReset())
+    Q_PRIVATE_SLOT(d_func(), void sourceLayoutAboutToBeChanged())
+    Q_PRIVATE_SLOT(d_func(), void sourceLayoutChanged())
+    Q_PRIVATE_SLOT(d_func(), void sourceDataChanged(const QModelIndex &, const QModelIndex &))
+    Q_PRIVATE_SLOT(d_func(), void sourceModelDestroyed())
+
+    Q_PRIVATE_SLOT(d_func(), void processPendingParents())
 
     // Make these private, they shouldn't be called by applications
 //   virtual bool insertRows(int , int, const QModelIndex & = QModelIndex());
@@ -201,4 +216,4 @@ private:
     //@endcond
 };
 
-#endif // KDESCENDANTSPROXYMODEL_H
+#endif

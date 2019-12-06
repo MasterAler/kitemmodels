@@ -73,14 +73,16 @@ KBreadcrumbSelectionModel::KBreadcrumbSelectionModel(QItemSelectionModel *select
       d_ptr(new KBreadcrumbSelectionModelPrivate(this, selectionModel, direction))
 {
     if (direction != MakeBreadcrumbSelectionInSelf)
-        connect(selectionModel, &KBreadcrumbSelectionModel::selectionChanged, [this](const QItemSelection &selected, const QItemSelection &deselected)
-        { d_ptr->sourceSelectionChanged(selected, deselected); });
+        connect(selectionModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
+                this, SLOT(sourceSelectionChanged(QItemSelection,QItemSelection)));
 
     d_ptr->init();
 }
 
 KBreadcrumbSelectionModel::~KBreadcrumbSelectionModel()
-{}
+{
+    delete d_ptr;
+}
 
 bool KBreadcrumbSelectionModel::isActualSelectionIncluded() const
 {
@@ -216,20 +218,10 @@ void KBreadcrumbSelectionModel::select(const QItemSelection &selection, QItemSel
 
 void KBreadcrumbSelectionModelPrivate::init()
 {
-    QObject::connect(m_selectionModel->model(), &QAbstractItemModel::layoutChanged
-               , [this](const QList<QPersistentModelIndex>& /*parents*/, QAbstractItemModel::LayoutChangeHint /*hint*/)
-    {
-        syncBreadcrumbs();
-    });
-
-    QObject::connect(m_selectionModel->model(), &QAbstractItemModel::modelReset, [this] { syncBreadcrumbs(); });
-
-    QObject::connect(m_selectionModel->model(), &QAbstractItemModel::rowsMoved
-               , [this] (const QModelIndex& /*parent*/, int /*start*/, int /*end*/, const QModelIndex& /*destination*/, int /*row*/)
-    {
-        syncBreadcrumbs();
-    });
-
+    Q_Q(KBreadcrumbSelectionModel);
+    q->connect(m_selectionModel->model(), SIGNAL(layoutChanged()), SLOT(syncBreadcrumbs()));
+    q->connect(m_selectionModel->model(), SIGNAL(modelReset()), SLOT(syncBreadcrumbs()));
+    q->connect(m_selectionModel->model(), SIGNAL(rowsMoved(QModelIndex,int,int,QModelIndex,int)), SLOT(syncBreadcrumbs()));
     // Don't need to handle insert & remove because they can't change the breadcrumbs on their own.
 }
 
@@ -238,3 +230,5 @@ void KBreadcrumbSelectionModelPrivate::syncBreadcrumbs()
     Q_Q(KBreadcrumbSelectionModel);
     q->select(m_selectionModel->selection(), QItemSelectionModel::ClearAndSelect);
 }
+
+#include "moc_kbreadcrumbselectionmodel.cpp"

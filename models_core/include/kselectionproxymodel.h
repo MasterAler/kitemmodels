@@ -315,7 +315,22 @@ protected:
 private:
     Q_DECLARE_PRIVATE(KSelectionProxyModel)
     //@cond PRIVATE
-    const QScopedPointer<KSelectionProxyModelPrivate> d_ptr;
+    KSelectionProxyModelPrivate *d_ptr;
+
+    Q_PRIVATE_SLOT(d_func(), void sourceRowsAboutToBeInserted(const QModelIndex &, int, int))
+    Q_PRIVATE_SLOT(d_func(), void sourceRowsInserted(const QModelIndex &, int, int))
+    Q_PRIVATE_SLOT(d_func(), void sourceRowsAboutToBeRemoved(const QModelIndex &, int, int))
+    Q_PRIVATE_SLOT(d_func(), void sourceRowsRemoved(const QModelIndex &, int, int))
+    Q_PRIVATE_SLOT(d_func(), void sourceRowsAboutToBeMoved(const QModelIndex &, int, int, const QModelIndex &, int))
+    Q_PRIVATE_SLOT(d_func(), void sourceRowsMoved(const QModelIndex &, int, int, const QModelIndex &, int))
+    Q_PRIVATE_SLOT(d_func(), void sourceModelAboutToBeReset())
+    Q_PRIVATE_SLOT(d_func(), void sourceModelReset())
+    Q_PRIVATE_SLOT(d_func(), void sourceLayoutAboutToBeChanged())
+    Q_PRIVATE_SLOT(d_func(), void sourceLayoutChanged())
+    Q_PRIVATE_SLOT(d_func(), void sourceDataChanged(const QModelIndex &, const QModelIndex &))
+    Q_PRIVATE_SLOT(d_func(), void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected))
+    Q_PRIVATE_SLOT(d_func(), void sourceModelDestroyed())
+
     //@endcond
 
 };

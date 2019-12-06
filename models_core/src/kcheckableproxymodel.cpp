@@ -45,15 +45,16 @@ KCheckableProxyModel::KCheckableProxyModel(QObject *parent)
 }
 
 KCheckableProxyModel::~KCheckableProxyModel()
-{ }
+{
+    delete d_ptr;
+}
 
 void KCheckableProxyModel::setSelectionModel(QItemSelectionModel *itemSelectionModel)
 {
     Q_D(KCheckableProxyModel);
     d->m_itemSelectionModel = itemSelectionModel;
     Q_ASSERT(sourceModel() ? d->m_itemSelectionModel->model() == sourceModel() : true);
-    connect(itemSelectionModel, &QItemSelectionModel::selectionChanged, [d](const QItemSelection &selected, const QItemSelection &deselected)
-    { d->selectionChanged(selected, deselected); });
+    connect(itemSelectionModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), SLOT(selectionChanged(QItemSelection,QItemSelection)));
 }
 
 QItemSelectionModel *KCheckableProxyModel::selectionModel() const
@@ -132,4 +133,6 @@ bool KCheckableProxyModel::select(const QItemSelection &selection, QItemSelectio
     d->m_itemSelectionModel->select(selection, command);
     return true;
 }
+
+#include "moc_kcheckableproxymodel.cpp"
 

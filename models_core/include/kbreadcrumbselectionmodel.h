@@ -148,10 +148,12 @@ public:
     void select(const QItemSelection &selection, QItemSelectionModel::SelectionFlags command) override;
 
 protected:
-    const QScopedPointer<KBreadcrumbSelectionModelPrivate> d_ptr;
+    KBreadcrumbSelectionModelPrivate *const d_ptr;
 private:
     //@cond PRIVATE
     Q_DECLARE_PRIVATE(KBreadcrumbSelectionModel)
+    Q_PRIVATE_SLOT(d_func(), void sourceSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected))
+    Q_PRIVATE_SLOT(d_func(), void syncBreadcrumbs())
     //@cond PRIVATE
 };
 
