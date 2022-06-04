@@ -6,15 +6,15 @@ This is a fork of [KItemModels](https://github.com/KDE/kitemmodels) library, wit
 
 ## Why forking?
 
-KItemModels is awesome, it contains several classes that can help a lot in building a truly advanced GUI, but it's been severely tied to the CMake and all that sophisticated build concept that the authors had seemingly been using in their everyday job. You can't just "take and use it", build is troubled on *Windows* and even on Linux *CMake* build is not all that straightforward and portable.
+KItemModels is awesome, it contains several classes that can help a lot in building a truly advanced GUI, but it's been severely tied to the CMake and all that sophisticated build concept that the authors had seemingly been using in their everyday job. You can't just "take and use it", build is troubled on **Windows** and even on Linux **CMake** build is not all that straightforward and portable.
 
 That goes with two more facts:
 1. Using **LGPL** library in any proprietary project (meaning your current job project) is possible via the shared library only, no "copying the sources as-is", which means a nessesity to have a convenient way to build it.
-2. Those who prefer *QMake* (a lot of crossplatform developers) would have gotten pain trying to use this library without some adaptation 
+2. Those who prefer **QMake** (a lot of crossplatform developers) would have gotten pain trying to use this library without some adaptation 
 
-## What is it here?
+## What can be found here?
 
-Solution to the inconveniences mentioned above is pretty simple and here it is, a *QMake* version of the library. It is a subdirectory project, that can be built by Qt Creator on both Windows & Linux. Even most of the autotests are present, they are not of much need really, so I've thrown away those that could not be launched without too much effort.
+Solution to the inconveniences mentioned above is pretty simple and here it is, a **QMake** version of the library. It is a subdirectory project, that can be built by Qt Creator on both **Windows & Linux**. Even most of the autotests are present, they are not of much need really, so I've thrown away those that could not be launched without too much effort.
 
 Yeah, that was not too difficult, but now this tool can become immediately useful in any Qt project.
 
