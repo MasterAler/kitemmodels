@@ -17,6 +17,8 @@
  *  Boston, MA 02110-1301, USA.
 */
 
+#include "TestSuite.h"
+
 #include <QSignalSpy>
 #include <QTest>
 
@@ -26,7 +28,7 @@ using namespace TestModelHelpers;
 
 Q_DECLARE_METATYPE(QModelIndex)
 
-class tst_KNumberModel: public QObject
+class tst_KNumberModel: public TestSuite
 {
     Q_OBJECT
 
@@ -64,7 +66,7 @@ private Q_SLOTS:
         m.setMaximumValue(4);
         m.setStepSize(0.4);
         QCOMPARE(m.rowCount(), 3);
-        QCOMPARE(m.data(m.index(2, 0), Qt::DisplayRole), QVariant("3.8"));
+        QCOMPARE(m.data(m.index(2, 0), Qt::DisplayRole), QVariant("3,8"));
     }
 
     void testLocale()
@@ -83,6 +85,6 @@ private Q_SLOTS:
 private:
 };
 
-QTEST_MAIN(tst_KNumberModel)
+static tst_KNumberModel TEST_KNumberModel;
 
 #include "knumbermodeltest.moc"

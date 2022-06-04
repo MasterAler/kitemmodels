@@ -25,8 +25,9 @@
 #include <QItemSelection>
 
 #include "kmodelindexproxymapper.h"
+#include "TestSuite.h"
 
-class ModelIndexProxyMapperTest : public QObject
+class ModelIndexProxyMapperTest : public TestSuite
 {
     Q_OBJECT
 private Q_SLOTS:
@@ -204,5 +205,6 @@ void ModelIndexProxyMapperTest::isConnected()
     QVERIFY(mapper2.isConnected());
 }
 
-QTEST_MAIN(ModelIndexProxyMapperTest)
+static ModelIndexProxyMapperTest TEST_ModelIndexProxyMapperTest;
+
 #include "kmodelindexproxymappertest.moc"

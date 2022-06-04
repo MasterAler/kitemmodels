@@ -261,5 +261,3 @@ void KLinkItemSelectionModelTest::testClearSelection()
     QVERIFY(m_subSelectionModel->selection().isEmpty());
 }
 
-QTEST_MAIN(KLinkItemSelectionModelTest)
-

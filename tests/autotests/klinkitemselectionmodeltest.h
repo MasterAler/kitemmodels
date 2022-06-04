@@ -21,13 +21,15 @@
 
 #include <QObject>
 
+#include "TestSuite.h"
+
 class QItemSelectionModel;
 class QStandardItemModel;
 class QSortFilterProxyModel;
 
 class KLinkItemSelectionModel;
 
-class KLinkItemSelectionModelTest : public QObject
+class KLinkItemSelectionModelTest : public TestSuite
 {
     Q_OBJECT
 
@@ -49,5 +51,7 @@ private:
     QSortFilterProxyModel *m_subModel;
     KLinkItemSelectionModel *m_subSelectionModel;
 };
+
+static KLinkItemSelectionModelTest TEST_KLinkItemSelectionModelTest;
 
 #endif /* KLINKITEMSELECTIONMODELTEST_H */
