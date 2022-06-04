@@ -150,8 +150,6 @@ public:
 
 private:
     Q_DECLARE_PRIVATE(KExtraColumnsProxyModel)
-    Q_PRIVATE_SLOT(d_func(), void _ec_sourceLayoutAboutToBeChanged(const QList<QPersistentModelIndex> &, QAbstractItemModel::LayoutChangeHint))
-    Q_PRIVATE_SLOT(d_func(), void _ec_sourceLayoutChanged(const QList<QPersistentModelIndex> &, QAbstractItemModel::LayoutChangeHint))
     const QScopedPointer<KExtraColumnsProxyModelPrivate> d_ptr;
 
 };

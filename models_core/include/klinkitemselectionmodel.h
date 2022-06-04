@@ -120,13 +120,10 @@ Q_SIGNALS:
     void linkedItemSelectionModelChanged();
 
 protected:
-    KLinkItemSelectionModelPrivate *const d_ptr;
+    const QScopedPointer<KLinkItemSelectionModelPrivate> d_ptr;
 
 private:
     Q_DECLARE_PRIVATE(KLinkItemSelectionModel)
-    Q_PRIVATE_SLOT(d_func(), void sourceSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected))
-    Q_PRIVATE_SLOT(d_func(), void sourceCurrentChanged(const QModelIndex &current))
-    Q_PRIVATE_SLOT(d_func(), void slotCurrentChanged(const QModelIndex &current))
 };
 
 #endif

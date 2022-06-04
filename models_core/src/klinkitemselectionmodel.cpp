@@ -95,9 +95,7 @@ KLinkItemSelectionModel::KLinkItemSelectionModel(QObject *parent)
 }
 
 KLinkItemSelectionModel::~KLinkItemSelectionModel()
-{
-    delete d_ptr;
-}
+{ }
 
 QItemSelectionModel *KLinkItemSelectionModel::linkedItemSelectionModel() const
 {
@@ -117,8 +115,15 @@ void KLinkItemSelectionModel::setLinkedItemSelectionModel(QItemSelectionModel *s
         d->m_linkedItemSelectionModel = selectionModel;
 
         if (d->m_linkedItemSelectionModel) {
-            connect(d->m_linkedItemSelectionModel, SIGNAL(selectionChanged(QItemSelection,QItemSelection)), SLOT(sourceSelectionChanged(QItemSelection,QItemSelection)));
-            connect(d->m_linkedItemSelectionModel, SIGNAL(currentChanged(QModelIndex,QModelIndex)), SLOT(sourceCurrentChanged(QModelIndex)));
+            connect(d->m_linkedItemSelectionModel, &QItemSelectionModel::selectionChanged
+                    , [this](const QItemSelection& selected, const QItemSelection& deselected) {
+               d_ptr->sourceSelectionChanged(selected, deselected);
+            });
+
+            connect(d->m_linkedItemSelectionModel, &QItemSelectionModel::currentChanged
+                    , [this](const QModelIndex& current, const QModelIndex& /*previous*/) {
+               d_ptr->sourceCurrentChanged(current);
+            });
 
             connect(d->m_linkedItemSelectionModel, &QItemSelectionModel::modelChanged, this, [this] {
                 d_ptr->reinitializeIndexMapper();

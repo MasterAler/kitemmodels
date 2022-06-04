@@ -120,17 +120,10 @@ protected:
     /** @reimp */
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
 
-    KRecursiveFilterProxyModelPrivate *const d_ptr;
-
 private:
-    //@cond PRIVATE
     Q_DECLARE_PRIVATE(KRecursiveFilterProxyModel)
-
-    Q_PRIVATE_SLOT(d_func(), void sourceDataChanged(const QModelIndex &source_top_left, const QModelIndex &source_bottom_right, const QVector<int> &roles = QVector<int>()))
-    Q_PRIVATE_SLOT(d_func(), void sourceRowsAboutToBeInserted(const QModelIndex &source_parent, int start, int end))
-    Q_PRIVATE_SLOT(d_func(), void sourceRowsInserted(const QModelIndex &source_parent, int start, int end))
-    Q_PRIVATE_SLOT(d_func(), void sourceRowsAboutToBeRemoved(const QModelIndex &source_parent, int start, int end))
-    Q_PRIVATE_SLOT(d_func(), void sourceRowsRemoved(const QModelIndex &source_parent, int start, int end))
+    //@cond PRIVATE
+    const QScopedPointer<KRecursiveFilterProxyModelPrivate> d_ptr;
     //@endcond
 };
 
